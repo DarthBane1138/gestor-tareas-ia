@@ -30,3 +30,11 @@ Para creación de archivos ---> touch docker-compose.yml .env .env.example .giti
 ### Docker
 
 docker ps ---> Para listar los contenedores en ejecución
+docker compose build ---> Build de todos los servicios
+docker compose build db
+docker compose build backend
+docker compose build frontend
+
+docker compose up -d db ---> para levantar el servicio (desde la raíz del proyecto) pero sólo 
+docker compose up -d backend
+base de datos
