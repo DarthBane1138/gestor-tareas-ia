@@ -35,6 +35,44 @@ docker compose build db
 docker compose build backend
 docker compose build frontend
 
-docker compose up -d db ---> para levantar el servicio (desde la raíz del proyecto) pero sólo 
-docker compose up -d backend
-base de datos
+docker compose up -d db ---> Levanta servicio base de datos
+docker compose up -d backend ---> Levanta servicio de backend
+docker compose up frontend
+
+### Tratamiento de errores
+
+- No se publicaba puerto de base de datos, las configuraciones eran correctas. Se ejecuta
+
+```bash
+docker compose down
+docker compose up -d --force--recreate db
+```
+
+### Comandos para verificación
+
+#### Verificar versiones dentro del contenedor
+
+docker compose run --rm --no-deps frontend node -v
+docker compose run --rm --no-deps frontend npm -v
+
+### Creación proyecto Vite en /frontend
+
+docker compose run --rm --no-deps frontend npm create vite@latest . --template react
+
+#### Instalación de dependencias
+
+docker compose run --rm --no-deps frontend npm install
+
+#### Levantar frontend en modo desarrollo
+
+docker compose run --rm --service-ports frontend npm run dev -- --host
+
+Si aparece error de permisos EACCES en node_modules:
+
+--> rm -rf frontend/node_modules
+--> docker compose run --rm --no-deps --user root frontend sh -lc 'mkdir -p /app/node_modules && chown -R 1000:1000 /app/node_modules'
+--> docker compose run --rm --no-deps frontend npm install
+
+## Flujo corto para uso diario (si se agrega en el servicio frontend)
+
+docker compose up frontend
