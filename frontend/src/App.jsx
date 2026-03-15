@@ -40,8 +40,15 @@ function App() {
 
   return (
     <main className="landing">
+      <button
+        type="button"
+        className="add-user-button"
+        onClick={() => navigate('/users/create')}
+      >
+        Agregar usuario
+      </button>
+
       <section className="card">
-        <p className="badge">Panel de Inicio</p>
         <h1>Organizador de TarIAs</h1>
         <p className="subtitle">
           Selecciona un usuario para comenzar a gestionar tareas.
@@ -66,12 +73,6 @@ function App() {
 
         {error && <p className="error">{error}</p>}
 
-        {selectedUser && (
-          <div className="selected">
-            <strong>Usuario seleccionado:</strong> {selectedUserName}
-          </div>
-        )}
-
         <button
           type="button"
           className="review-button"
@@ -82,7 +83,7 @@ function App() {
             })
           }
         >
-          {selectedUser ? 'Revisar tareas' : 'Selecciona un usuario para revisar tareas'}
+          {selectedUser ? `Revisar tareas de ${selectedUserName}` : 'Selecciona un usuario para revisar tareas'}
         </button>
 
       </section>

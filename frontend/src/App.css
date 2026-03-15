@@ -4,9 +4,9 @@
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(circle at 15% 20%, rgba(255, 179, 102, 0.25), transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(76, 201, 240, 0.2), transparent 45%),
-    linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+    radial-gradient(circle at 15% 20%, rgba(255, 179, 102, 0.2), transparent 48%),
+    radial-gradient(circle at 85% 15%, rgba(76, 201, 240, 0.14), transparent 48%),
+    linear-gradient(160deg, #31415f 0%, #1f2a40 100%);
 }
 
 .card {
@@ -107,7 +107,58 @@ select:focus {
   box-shadow: none;
 }
 
+.add-user-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+  border: 1px solid #6b7f9c;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e8f1ff;
+  background: rgba(24, 38, 61, 0.78);
+  backdrop-filter: blur(3px);
+  box-shadow: 0 6px 18px rgba(8, 15, 27, 0.35);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.add-user-button:hover {
+  background: rgba(36, 55, 84, 0.88);
+  transform: translateY(-1px);
+}
+
+.create-user-actions {
+  margin-top: 16px;
+}
+
+.create-user-back-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  color: #1f3145;
+  background: #e5edf8;
+  border: 1px solid #c5d3e8;
+  border-radius: 12px;
+  padding: 11px 16px;
+}
+
+.create-user-back-link:hover {
+  background: #dce8f7;
+}
+
 @media (max-width: 640px) {
+  .add-user-button {
+    top: 14px;
+    right: 14px;
+    padding: 9px 14px;
+    font-size: 0.84rem;
+  }
+
   .card {
     padding: 22px;
     border-radius: 14px;
