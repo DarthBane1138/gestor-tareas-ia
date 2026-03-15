@@ -11,6 +11,9 @@ function CreateTaskPage() {
   const [submitting, setSubmitting] = useState(false)
   const [loadingCategories, setLoadingCategories] = useState(true)
   const [formError, setFormError] = useState('')
+  const [isClassifying, setIsClassifying] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiSuggestion, setAiSuggestion] = useState(null)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -44,12 +47,15 @@ function CreateTaskPage() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target
+    setAiError('')
+    setAiSuggestion(null)
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleCreateTask = async (event) => {
     event.preventDefault()
     setFormError('')
+    setIsClassifying(false)
 
     if (!formData.title.trim()) {
       setFormError('El título es obligatorio.')
@@ -62,6 +68,10 @@ function CreateTaskPage() {
     }
 
     try {
+      const selectedCategoryId = String(formData.category_id)
+      const suggestedCategoryId = String(aiSuggestion?.suggested_category_id ?? '')
+      const createdWithAI = Boolean(aiSuggestion) && selectedCategoryId === suggestedCategoryId
+
       setSubmitting(true)
       const response = await fetch(`/api/users/${userId}/tasks/`, {
         method: 'POST',
@@ -80,12 +90,60 @@ function CreateTaskPage() {
       }
 
       navigate(`/users/${userId}/tasks`, {
-        state: { userName, created: true },
+        state: {
+          userName,
+          created: true,
+          createdWithAI,
+        },
       })
     } catch (err) {
       setFormError(err.message || 'Error al crear la tarea')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleClassifyWithAI = async () => {
+    const title = formData.title.trim()
+    const description = formData.description.trim()
+
+    setFormError('')
+    setAiError('')
+    setAiSuggestion(null)
+
+    if (!title) {
+      setAiError('Ingresa un título antes de pedir sugerencia IA.')
+      return
+    }
+
+    try {
+      setIsClassifying(true)
+      const response = await fetch(`/api/users/${userId}/tasks/classify/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description: description || null,
+        }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        if (payload?.code === 'ai_unavailable') {
+          throw new Error('El servicio de IA no está disponible en este momento. Intenta nuevamente.')
+        }
+        throw new Error(payload?.detail || `Error ${response.status}: no se pudo clasificar la tarea`)
+      }
+
+      setAiSuggestion(payload)
+      setFormData((prev) => ({
+        ...prev,
+        category_id: String(payload.suggested_category_id ?? ''),
+      }))
+    } catch (err) {
+      setAiError(err.message || 'No se pudo obtener sugerencia IA')
+    } finally {
+      setIsClassifying(false)
     }
   }
 
@@ -145,6 +203,14 @@ function CreateTaskPage() {
                 </option>
               ))}
             </select>
+            <button
+              type="button"
+              className="in-progress-task-button"
+              onClick={handleClassifyWithAI}
+              disabled={submitting || loadingCategories || isClassifying}
+            >
+              {isClassifying ? 'Consultando IA...' : 'Sugerir categoría con IA'}
+            </button>
 
             <label htmlFor="status">Estado</label>
             <select
@@ -168,6 +234,17 @@ function CreateTaskPage() {
           </form>
 
           {formError && <p className="error">{formError}</p>}
+          {isClassifying && <p className="ai-info">Consultando sugerencia IA...</p>}
+          {aiError && <p className="error">{aiError}</p>}
+          {aiSuggestion && (
+            <div className="ai-suggestion-card">
+              <p className="ai-suggestion-title">Sugerencia IA aplicada</p>
+              <p>
+                Categoría: <strong>{aiSuggestion.suggested_category}</strong> ({Math.round((aiSuggestion.confidence || 0) * 100)}%)
+              </p>
+              {aiSuggestion.reason && <p>Motivo: {aiSuggestion.reason}</p>}
+            </div>
+          )}
         </section>
       </section>
     </main>

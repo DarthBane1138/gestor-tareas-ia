@@ -7,6 +7,7 @@ from .views import (
     UserTaskListView,
     CompleteTaskView,
     UpdateTaskStatusView,
+    ClassifyTaskView,
 )
 
 urlpatterns = [
@@ -23,5 +24,10 @@ urlpatterns = [
         "users/<int:user_id>/tasks/<int:task_id>/status/",
         UpdateTaskStatusView.as_view(),
         name="update_task_status",
+    ),
+    path(
+        "users/<int:user_id>/tasks/classify/",
+        ClassifyTaskView.as_view(),
+        name="classify_task",
     ),
 ]

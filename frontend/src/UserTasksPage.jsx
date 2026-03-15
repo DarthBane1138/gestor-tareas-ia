@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import './UserTasksPage.css'
 
 function UserTasksPage() {
   const { userId } = useParams()
   const { state } = useLocation()
+  const navigate = useNavigate()
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [updatingTaskId, setUpdatingTaskId] = useState(null)
+  const [successMessage, setSuccessMessage] = useState('')
 
   const loadTasks = async () => {
     try {
@@ -33,6 +35,31 @@ function UserTasksPage() {
     () => state?.userName || tasks[0]?.full_name || `Usuario #${userId}`,
     [state, tasks, userId],
   )
+
+  useEffect(() => {
+    if (!state?.created) return
+
+    const message = state?.createdWithAI
+      ? 'Tarea creada correctamente con categoría sugerida por IA.'
+      : 'Tarea creada correctamente.'
+
+    setSuccessMessage(message)
+
+    navigate(`/users/${userId}/tasks`, {
+      replace: true,
+      state: state?.userName ? { userName: state.userName } : undefined,
+    })
+  }, [state, navigate, userId])
+
+  useEffect(() => {
+    if (!successMessage) return
+
+    const timeoutId = setTimeout(() => {
+      setSuccessMessage('')
+    }, 4500)
+
+    return () => clearTimeout(timeoutId)
+  }, [successMessage])
 
   const handleMarkAsCompleted = async (taskId) => {
     try {
@@ -87,6 +114,7 @@ function UserTasksPage() {
         </div>
 
         {loading && <p>Cargando tareas...</p>}
+        {successMessage && <p className="success">{successMessage}</p>}
         {error && <p className="error">{error}</p>}
 
         {!loading && !error && tasks.length === 0 && (

@@ -47,3 +47,31 @@ class TaskWriteSerializer(serializers.ModelSerializer):
         if value == 'Completada':
             raise serializers.ValidationError('Una tarea no puede crearse como Completada.')
         return value
+
+
+class TaskClassificationRequestSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=200, trim_whitespace=True)
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+
+    def validate_title(self, value):
+        if not value.strip():
+            raise serializers.ValidationError('El título es obligatorio.')
+        return value
+
+
+class TaskClassificationResponseSerializer(serializers.Serializer):
+    suggested_category_id = serializers.IntegerField(min_value=1)
+    suggested_category = serializers.CharField(max_length=255)
+    confidence = serializers.FloatField(min_value=0.0, max_value=1.0)
+    reason = serializers.CharField()
+    provider = serializers.CharField(max_length=50)
+    model = serializers.CharField(max_length=100)
+
+
+class TaskClassificationErrorSerializer(serializers.Serializer):
+    detail = serializers.CharField()
+    code = serializers.CharField()

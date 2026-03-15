@@ -10,6 +10,13 @@ from .serializers import (
     AppUserSerializer,
     TaskReadSerializer,
     TaskWriteSerializer,
+    TaskClassificationRequestSerializer,
+    TaskClassificationResponseSerializer,
+)
+from .services.task_classifier import (
+    LangChainTaskClassifier,
+    TaskClassifierError,
+    TaskClassifierUnavailableError,
 )
 
 class HealthCheckView(APIView):
@@ -105,3 +112,63 @@ class UpdateTaskStatusView(APIView):
 
         serializer = TaskReadSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ClassifyTaskView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request, user_id):
+        if not AppUser.objects.filter(user_id=user_id).exists():
+            return Response(
+                {"detail": "Usuario no encontrado.", "code": "user_not_found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        request_serializer = TaskClassificationRequestSerializer(data=request.data)
+        if not request_serializer.is_valid():
+            first_error = next(iter(request_serializer.errors.values()))
+            detail = first_error[0] if isinstance(first_error, list) else str(first_error)
+            return Response(
+                {"detail": detail, "code": "validation_error"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        categories = list(
+            Category.objects.order_by("category_id").values("category_id", "description")
+        )
+        if not categories:
+            return Response(
+                {"detail": "No hay categorias disponibles.", "code": "validation_error"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        classifier = LangChainTaskClassifier()
+        payload = request_serializer.validated_data
+        try:
+            result = classifier.classify_task(
+                title=payload["title"],
+                description=payload.get("description"),
+                categories=categories,
+            )
+        except (TaskClassifierUnavailableError, TaskClassifierError):
+            return Response(
+                {
+                    "detail": "Servicio de clasificacion no disponible.",
+                    "code": "ai_unavailable",
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        category_map = {category["category_id"]: category["description"] for category in categories}
+        response_payload = {
+            "suggested_category_id": result.suggested_category_id,
+            "suggested_category": category_map[result.suggested_category_id],
+            "confidence": result.confidence,
+            "reason": result.reason,
+            "provider": result.provider,
+            "model": result.model,
+        }
+        response_serializer = TaskClassificationResponseSerializer(data=response_payload)
+        response_serializer.is_valid(raise_exception=True)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
