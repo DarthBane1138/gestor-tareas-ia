@@ -35,9 +35,13 @@ docker compose build db
 docker compose build backend
 docker compose build frontend
 
+docker compose up -d --build frontend backend
+
 docker compose up -d db ---> Levanta servicio base de datos
 docker compose up -d backend ---> Levanta servicio de backend
 docker compose up frontend
+
+http://localhost:5173
 
 ### Tratamiento de errores
 
@@ -72,6 +76,7 @@ Si aparece error de permisos EACCES en node_modules:
 --> rm -rf frontend/node_modules
 --> docker compose run --rm --no-deps --user root frontend sh -lc 'mkdir -p /app/node_modules && chown -R 1000:1000 /app/node_modules'
 --> docker compose run --rm --no-deps frontend npm install
+--> docker compose run --rm --no-deps frontend npm install react-router-dom
 
 ## Flujo corto para uso diario (si se agrega en el servicio frontend)
 

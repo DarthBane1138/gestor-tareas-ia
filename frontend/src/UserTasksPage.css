@@ -1,0 +1,94 @@
+.tasks-page {
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(255, 179, 102, 0.2), transparent 42%),
+    radial-gradient(circle at 90% 12%, rgba(76, 201, 240, 0.15), transparent 42%),
+    linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.tasks-card {
+  width: min(1024px, 100%);
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dbe3f3;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 14px 34px rgba(10, 24, 40, 0.12);
+}
+
+.tasks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tasks-header h1 {
+  margin: 0;
+  color: #12263a;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+}
+
+.back-link {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 700;
+  color: #1f3145;
+  background: #e5edf8;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.back-link:hover {
+  background: #d7e4f4;
+}
+
+.tasks-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tasks-table th,
+.tasks-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e3eaf4;
+  vertical-align: top;
+}
+
+.tasks-table th {
+  background: #f1f6fd;
+  color: #1f3145;
+  font-weight: 700;
+}
+
+.tasks-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+@media (max-width: 760px) {
+  .tasks-page {
+    padding: 16px;
+  }
+
+  .tasks-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .tasks-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tasks-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
