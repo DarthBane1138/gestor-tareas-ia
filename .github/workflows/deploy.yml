@@ -9,3 +9,13 @@ jobs:
     steps:
       - name: Mostrar mensaje oi
         run: echo "Hola coquetón"
+
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+    
+      - name: Validar docker compose
+        run: docker compose config -q
+
+      - name: Listar servicios detectados
+        run: docker compose config --services
+    
