@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import './UserTasksPage.css'
 
+const STATUS_PRIORITY = {
+  Pendiente: 0,
+  'En progreso': 1,
+  Completada: 2,
+}
+
 function UserTasksPage() {
   const { userId } = useParams()
   const { state } = useLocation()
@@ -11,6 +17,8 @@ function UserTasksPage() {
   const [error, setError] = useState('')
   const [updatingTaskId, setUpdatingTaskId] = useState(null)
   const [successMessage, setSuccessMessage] = useState('')
+  const [hideCompleted, setHideCompleted] = useState(false)
+  const [showPendingOnly, setShowPendingOnly] = useState(false)
 
   const loadTasks = async () => {
     try {
@@ -35,6 +43,40 @@ function UserTasksPage() {
     () => state?.userName || tasks[0]?.full_name || `Usuario #${userId}`,
     [state, tasks, userId],
   )
+
+  const orderedTasks = useMemo(() => {
+    return [...tasks].sort((a, b) => {
+      const aPriority = STATUS_PRIORITY[a.status] ?? 99
+      const bPriority = STATUS_PRIORITY[b.status] ?? 99
+
+      if (aPriority !== bPriority) return aPriority - bPriority
+      return (a.task_id ?? 0) - (b.task_id ?? 0)
+    })
+  }, [tasks])
+
+  const visibleTasks = useMemo(() => {
+    let filteredTasks = orderedTasks
+
+    if (showPendingOnly) {
+      return filteredTasks.filter((task) => task.status === 'Pendiente')
+    }
+
+    if (hideCompleted) {
+      filteredTasks = filteredTasks.filter((task) => task.status !== 'Completada')
+    }
+
+    return filteredTasks
+  }, [hideCompleted, orderedTasks, showPendingOnly])
+
+  const handleTogglePendingOnly = () => {
+    setShowPendingOnly((previousValue) => {
+      const nextValue = !previousValue
+      if (nextValue) {
+        setHideCompleted(false)
+      }
+      return nextValue
+    })
+  }
 
   useEffect(() => {
     if (!state?.created) return
@@ -109,6 +151,22 @@ function UserTasksPage() {
             >
               Crear tarea
             </Link>
+            {!showPendingOnly && (
+              <button
+                type="button"
+                className="toggle-completed-button"
+                onClick={() => setHideCompleted((prev) => !prev)}
+              >
+                {hideCompleted ? 'Mostrar completadas' : 'Ocultar completadas'}
+              </button>
+            )}
+            <button
+              type="button"
+              className="toggle-completed-button"
+              onClick={handleTogglePendingOnly}
+            >
+              {showPendingOnly ? 'Ver todas' : 'Ver solo pendientes'}
+            </button>
             <Link to="/" className="back-link">Volver</Link>
           </div>
         </div>
@@ -121,7 +179,11 @@ function UserTasksPage() {
           <p>No hay tareas registradas para este usuario.</p>
         )}
 
-        {!loading && !error && tasks.length > 0 && (
+        {!loading && !error && tasks.length > 0 && visibleTasks.length === 0 && (
+          <p>{showPendingOnly ? 'No hay tareas pendientes visibles.' : 'No hay tareas visibles con el filtro actual.'}</p>
+        )}
+
+        {!loading && !error && visibleTasks.length > 0 && (
           <table className="tasks-table">
             <thead>
               <tr>
@@ -133,7 +195,7 @@ function UserTasksPage() {
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task) => (
+              {visibleTasks.map((task) => (
                 <tr
                   key={task.task_id}
                   className={`task-row ${

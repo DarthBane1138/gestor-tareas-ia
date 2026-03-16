@@ -31,7 +31,6 @@ class LangChainTaskClassifier:
         self.api_key = (
             os.getenv("GEMINI_API_KEY", "").strip()
             or os.getenv("GOOGLE_API_KEY", "").strip()
-            or os.getenv("OPENAI_API_KEY", "").strip()
         )
 
     def classify_task(self, title, description, categories):

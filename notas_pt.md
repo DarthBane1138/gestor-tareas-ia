@@ -81,3 +81,7 @@ Si aparece error de permisos EACCES en node_modules:
 ## Flujo corto para uso diario (si se agrega en el servicio frontend)
 
 docker compose up frontend
+
+## Tests
+
+docker compose run --rm --no-deps frontend npm run test

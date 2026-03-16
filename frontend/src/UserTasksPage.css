@@ -65,6 +65,21 @@
   background: #d7e4f4;
 }
 
+.toggle-completed-button {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1f3145;
+  background: #dbeafe;
+  cursor: pointer;
+}
+
+.toggle-completed-button:hover {
+  background: #c7def8;
+}
+
 .tasks-table {
   width: 100%;
   border-collapse: collapse;
@@ -108,6 +123,7 @@
 
 .tasks-table tbody tr.task-row--completed td {
   background: rgba(22, 163, 74, 0.07);
+  color: #5f6f82;
 }
 
 /* Hover levemente mas marcado, manteniendo el estado */
@@ -307,7 +323,8 @@
   }
 
   .create-task-link,
-  .back-link {
+  .back-link,
+  .toggle-completed-button {
     text-align: center;
   }
 

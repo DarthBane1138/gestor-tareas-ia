@@ -5,8 +5,6 @@ services:
     image: postgres:16
     container_name: tasks_db
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -49,8 +47,6 @@ services:
     build: ./frontend
     container_name: tasks_frontend
     restart: unless-stopped
-    env_file:
-      - .env
     ports:
       - "${FRONTEND_PORT}:5173"
     volumes:
