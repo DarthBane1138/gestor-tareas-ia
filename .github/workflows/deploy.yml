@@ -39,6 +39,12 @@ jobs:
       - name: Listar servicios detectados
         run: docker compose config --services
     
-      - name: Build base de datos
+      - name: up base de datos
         run: docker compose up -d db
+
+      - name: up backend
+        run: docker compose up -d backend
+
+      - name: up frontend
+        run: docker compose up -d frontend
     
