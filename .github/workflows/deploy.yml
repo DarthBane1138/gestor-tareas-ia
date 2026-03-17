@@ -40,5 +40,5 @@ jobs:
         run: docker compose config --services
     
       - name: Build base de datos
-        run: docker compose build -d db
+        run: docker compose up -d db
     
