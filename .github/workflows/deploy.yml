@@ -11,25 +11,25 @@ jobs:
         run: echo "Hola coquetón"
 
       - name: Checkout del repositorio
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
-      - name: Crear .enc temporal para Compose
+      - name: Crear .env temporal para Compose
         run: |
           cat <<EOF > .env
-          POSTGRES_DB= ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER= ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD= ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_HOST= ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT= ${{ secrets.POSTGRES_PORT }}
-          BACKEND_PORT= 8000
-          FRONTEND_PORT= 5173
+          POSTGRES_DB=${{secrets.POSTGRES_DB}}
+          POSTGRES_USER=${{secrets.POSTGRES_USER}}
+          POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}}
+          POSTGRES_HOST=${{secrets.POSTGRES_HOST}}
+          POSTGRES_PORT=${{secrets.POSTGRES_PORT}}
+          BACKEND_PORT=8000
+          FRONTEND_PORT=5173
           UID=1000
           GID=1000
           HOST_UID=1000
           HOST_GID=1000
           ALLOWED_HOSTS= localhost, 127.0.0.1, backend
           LLM_PROVIDER=gemini
-          GEMINI_API_KEY= ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY=${{secrets.GEMINI_API_KEY}}
           GEMINI_MODEL= gemini-2.5-flash
           EOF
     
@@ -38,4 +38,7 @@ jobs:
 
       - name: Listar servicios detectados
         run: docker compose config --services
+    
+      - name: Build base de datos
+        run: docker compose build -d db
     

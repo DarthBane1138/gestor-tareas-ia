@@ -85,3 +85,17 @@ docker compose up frontend
 ## Tests
 
 docker compose run --rm --no-deps frontend npm run test
+
+## Algunos comandos adicionales
+
+docker images ---> Imágenes descargadas en el pc
+
+Una imagen en Docker es una plantilla, un contenedor por otro lado es una instancia en ejecución o creada a partir de esa plantilla
+
+docker run --> Primero revisa si se encuentra la imagen, si no la encuentra, la descarga,, luego crea un contenedor, y luego inicia el contenedor, es decir, hace las tres acciones. Descarga la imagen --> Instala el contenedor --> Incicia el contenedor (docker run)
+
+## Dockerfile
+
+El archivo Dockerfile se utiliza para que podamos construir nuestros containers, acá se escriben las instrucciones que necesita nuestro contenedor para poder crearse
+
+docker build ---> Es el comando que utilizaremos para poder crear imágenes en base a un archivo Dockerfile que hayamos creado antes
