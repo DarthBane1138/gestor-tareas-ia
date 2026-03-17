@@ -47,4 +47,23 @@ jobs:
 
       - name: up frontend
         run: docker compose up -d frontend
+
+      - name: Mostrar servicio disponibles
+        run: docker compose ps
+      
+      - name: Esperar por respuesta de API
+        run: |
+          for i in {1..10}; do
+            if curl -s http://localhost:8000/api/health/; then
+              echo "API está disponible"
+              exit 0
+            else
+              echo "Esperando por API... intento $i"
+              sleep 5
+            fi
+          done
+          echo "API no respondió después de varios intentos"
+          exit 1
+      - name: Shutdown
+        run: docker compose down
     
