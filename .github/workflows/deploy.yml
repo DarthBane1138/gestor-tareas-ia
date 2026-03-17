@@ -64,6 +64,7 @@ jobs:
           done
           echo "API no respondió después de varios intentos"
           exit 1
+      
       - name: Shutdown
         run: docker compose down
     
